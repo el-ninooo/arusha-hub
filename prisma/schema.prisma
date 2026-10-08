@@ -1,0 +1,156 @@
+# Prisma schema for ARUSHA HUB
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Property {
+  id          String          @id @default(cuid())
+  name        String
+  slug        String          @unique
+  description String
+  type        String
+  location    String
+  address     String
+  latitude    Float?
+  longitude   Float?
+  rating      Float           @default(0)
+  contact     String
+  published   Boolean         @default(false)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  rooms       Room[]
+  images      PropertyImage[]
+  bookings    Booking[]
+}
+
+model Room {
+  id          String   @id @default(cuid())
+  propertyId   String
+  name        String
+  description String
+  capacity    Int
+  price       Float
+  available   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  property    Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  bookings    Booking[]
+}
+
+model PropertyImage {
+  id         String   @id @default(cuid())
+  propertyId String
+  imageUrl   String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+}
+
+model Vehicle {
+  id            String           @id @default(cuid())
+  name          String
+  slug          String           @unique
+  type          String
+  brand         String
+  model         String
+  year          Int
+  seats         Int
+  transmission  String
+  fuel          String
+  pricePerDay   Float
+  pickupLocation String
+  withDriver    Boolean          @default(false)
+  selfDrive     Boolean          @default(false)
+  description   String
+  published     Boolean          @default(false)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  images        VehicleImage[]
+  bookings      Booking[]
+}
+
+model VehicleImage {
+  id         String   @id @default(cuid())
+  vehicleId  String
+  imageUrl   String
+  vehicle    Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+}
+
+model Booking {
+  id               String   @id @default(cuid())
+  reference        String   @unique
+  serviceType      String
+  customerName     String
+  customerPhone    String
+  customerEmail    String
+  propertyId        String?
+  roomId           String?
+  vehicleId        String?
+  checkIn          DateTime?
+  checkOut         DateTime?
+  pickupDate       DateTime?
+  returnDate       DateTime?
+  guests           Int?
+  total            Float
+  status           String   @default("Pending")
+  notes            String?
+  createdAt        DateTime @default(now())
+  property         Property? @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+  room            Room? @relation(fields: [roomId], references: [id], onDelete: SetNull)
+  vehicle         Vehicle? @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+}
+
+model PropertySubmission {
+  id          String   @id @default(cuid())
+  name        String
+  propertyType String
+  location    String
+  phone       String
+  email       String
+  description String
+  roomsCount  Int
+  priceRange  String
+  images      String[]
+  status      String   @default("Pending Review")
+  createdAt   DateTime @default(now())
+}
+
+model VehicleSubmission {
+  id              String   @id @default(cuid())
+  name            String
+  companyName     String?
+  phone           String
+  email           String
+  vehicle         String
+  model           String
+  year            Int
+  seats           Int
+  transmission    String
+  fuel            String
+  pricePerDay     Float
+  rentalType      String
+  pickupLocation  String
+  images          String[]
+  status          String   @default("Pending Review")
+  createdAt       DateTime @default(now())
+}
+
+model AdminUser {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  passwordHash  String
+  role          String   @default("admin")
+  createdAt     DateTime @default(now())
+}
+
+model SiteSettings {
+  id             String   @id @default(cuid())
+  whatsapp       String?
+  phone          String?
+  email          String?
+  address        String?
+  updatedAt      DateTime @updatedAt
+}
