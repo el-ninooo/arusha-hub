@@ -1,0 +1,21 @@
+import type { Metadata } from "next";
+import "./globals.css";
+
+export const metadata: Metadata = {
+  title: "ARUSHA HUB",
+  description: "Your Gateway to Arusha.",
+  metadataBase: new URL("https://arusha-hub.example"),
+  openGraph: {
+    title: "ARUSHA HUB",
+    description: "Your Gateway to Arusha.",
+    type: "website",
+  },
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  );
+}
